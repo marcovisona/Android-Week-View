@@ -179,7 +179,7 @@ public class WeekView extends View {
     private boolean mAutoLimitTime = false;
     private boolean mEnableDropListener = false;
     private int mMinOverlappingMinutes = 0;
-    private boolean mScrollNumberOfVisibleDays = false;
+    private boolean mIsScrollNumberOfVisibleDays = false;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -296,7 +296,7 @@ public class WeekView extends View {
             switch (mCurrentFlingDirection) {
                 case LEFT:
                 case RIGHT:
-                    if(!mScrollNumberOfVisibleDays) {
+                    if(!mIsScrollNumberOfVisibleDays) {
                         mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, (int) (velocityX * mXScrollingSpeed), 0, (int) getXMinLimit(), (int) getXMaxLimit(), (int) getYMinLimit(), (int) getYMaxLimit());
                     }
                     break;
@@ -510,7 +510,7 @@ public class WeekView extends View {
             if (a.getBoolean(R.styleable.WeekView_dropListenerEnabled, false))
                 this.enableDropListener();
             mMinOverlappingMinutes = a.getInt(R.styleable.WeekView_minOverlappingMinutes, 0);
-            mScrollNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_scrollNumberOfVisibleDays, false);
+            mIsScrollNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_isScrollNumberOfVisibleDays, false);
         } finally {
             a.recycle();
         }
@@ -2534,6 +2534,15 @@ public class WeekView extends View {
         return this.mMinOverlappingMinutes;
     }
 
+    public boolean isScrollNumberOfVisibleDays() {
+        return this.mIsScrollNumberOfVisibleDays;
+    }
+
+    public void setScrollNumberOfVisibleDays(boolean scrollNumberOfVisibleDays) {
+        this.mIsScrollNumberOfVisibleDays = scrollNumberOfVisibleDays;
+        invalidate();
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
@@ -2566,9 +2575,9 @@ public class WeekView extends View {
         float beforeScroll = mStartOriginForScroll;
         boolean isPassed = false;
 
-        if (mDistanceDone > mDistanceMin || mDistanceDone < -mDistanceMin || !mScrollNumberOfVisibleDays) {
+        if (mDistanceDone > mDistanceMin || mDistanceDone < -mDistanceMin || !mIsScrollNumberOfVisibleDays) {
 
-            if (!mScrollNumberOfVisibleDays && mCurrentFlingDirection != Direction.NONE) {
+            if (!mIsScrollNumberOfVisibleDays && mCurrentFlingDirection != Direction.NONE) {
                 // snap to nearest day
                 leftDays = Math.round(leftDays);
             } else if (mCurrentScrollDirection == Direction.LEFT) {
@@ -2587,7 +2596,7 @@ public class WeekView extends View {
             }
 
 
-            if (mScrollNumberOfVisibleDays) {
+            if (mIsScrollNumberOfVisibleDays) {
                 boolean mayScrollHorizontal = beforeScroll - mStartOriginForScroll < getXMaxLimit() && mCurrentOrigin.x - mStartOriginForScroll > getXMinLimit();
                 if (isPassed && mayScrollHorizontal) {
                     // Stop current animation.
